@@ -5,7 +5,7 @@ library(openxlsx)
 library(ggplot2)
 library(ggrepel)
 library(plotly)
-library(gganimate)
+#library(gganimate)
 library(kableExtra)
 
 rm(list = ls())
@@ -32,7 +32,7 @@ AUMFilter <- 100
 ACFilter <- "Fixed Income"
 ChartGroups <- c("H1", "Q3", "Q4")
 ################################################
-dataset <- read.xlsx("ITApg_dataset.xlsx", detectDates = T) %>%
+dataset <- read.xlsx("./app_v1/ITApg_dataset.xlsx", detectDates = T) %>%
   mutate(PeerGroup = gsub("EAA Fund ", "", PeerGroup),
          AM = gsub(" .*", "", AM),
          Date = as.Date(format(Date, "%Y-%m-01"))) %>%
@@ -223,7 +223,7 @@ distMedioComp %>%
        caption = "Positive = good",
        x = "", y = "")
 
-p <- distMedioComp %>%
+distMedioComp %>%
   filter(AssetClass == "Fixed Income",
          Frame == "Net22J") %>%
   #ggplot(aes(x = Date, y = Dist, text = paste("Ref/Comp:", PeerGroup, paste(Count_Main, Count_Comp, sep = "/")), color = AssetClass)) +
@@ -239,15 +239,15 @@ p <- distMedioComp %>%
   labs(title = paste(refAMFilter, "vs. competitors"), 
        #subtitle = paste("Competitors percentiles less", refAMFilter, "percentile by PG"), 
        caption = "Positive = good",
-       x = "", y = "") +
-  transition_time(Date) #+
+       x = "", y = "") #+
+  #transition_time(Date) #+
   #labs(subtitle = "Date: {frame_time}") +
   #shadow_wake(wake_length = 0.1)
 
 animate(p, renderer = gifski_renderer(loop = T), height = 900, width = 1200)
 anim_save("anim.gif")
 
-distMedioComp %>%
+p <- distMedioComp %>%
   filter(AssetClass == "MultiAsset",
          Frame == "Net22J") %>%
   ggplot(aes(x = Date, y = Dist, text = paste("Ref/Comp:", PeerGroup, paste(Count_Main, Count_Comp, sep = "/")), color = AssetClass)) +
